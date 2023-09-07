@@ -19,7 +19,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private  String jwtSecret;
 
-    @Value("${app.jwt-expiration-milliseconds}")
+    @Value("${app-jwt-expiration-milliseconds}")
     private  long jwtExpirationDate;
 
     public  String generateToken(Authentication authentication){
@@ -48,7 +48,7 @@ public class JwtTokenProvider {
         Claims claims=Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
 
         String username =claims.getSubject();
@@ -61,7 +61,7 @@ public class JwtTokenProvider {
             Jwts.parserBuilder()
                     .setSigningKey(key())
                     .build()
-                    .parse(token);
+                     .parse(token);
         } catch (ExpiredJwtException ex) {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST,"Expired JWT token");
         } catch (MalformedJwtException ex) {

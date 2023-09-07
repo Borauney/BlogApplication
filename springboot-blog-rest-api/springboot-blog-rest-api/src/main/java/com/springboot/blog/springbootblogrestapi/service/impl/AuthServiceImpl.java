@@ -3,10 +3,12 @@ package com.springboot.blog.springbootblogrestapi.service.impl;
 import com.springboot.blog.springbootblogrestapi.entity.Role;
 import com.springboot.blog.springbootblogrestapi.entity.User;
 import com.springboot.blog.springbootblogrestapi.exception.BlogAPIException;
+import com.springboot.blog.springbootblogrestapi.payload.JWTAuthResponse;
 import com.springboot.blog.springbootblogrestapi.payload.LoginDto;
 import com.springboot.blog.springbootblogrestapi.payload.RegisterDto;
 import com.springboot.blog.springbootblogrestapi.repository.RoleRepository;
 import com.springboot.blog.springbootblogrestapi.repository.UserRepository;
+import com.springboot.blog.springbootblogrestapi.security.JwtTokenProvider;
 import com.springboot.blog.springbootblogrestapi.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,15 +29,18 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager
-            ,UserRepository userRepository
-            ,RoleRepository roleRepository
-            ,PasswordEncoder passwordEncoder) {
+            , UserRepository userRepository
+            , RoleRepository roleRepository
+            , PasswordEncoder passwordEncoder
+    , JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository=userRepository;
         this.roleRepository=roleRepository;
         this.passwordEncoder=passwordEncoder;
+        this.jwtTokenProvider=jwtTokenProvider;
     }
 
     @Override
@@ -44,8 +49,9 @@ public class AuthServiceImpl implements AuthService {
                 loginDto.getUsernameOrEmail(),loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtTokenProvider.generateToken(authentication);
 
-        return "User Logged-in Successfully!.";
+        return token;
     }
 
     @Override
